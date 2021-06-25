@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const csrf = require('csurf');
 
 const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
@@ -15,6 +16,8 @@ const Order = require('./models/order');
 const OrderItem = require('./models/order-item');
 
 const app = express();
+
+const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -29,8 +32,15 @@ app.use(session({
     secret: process.env.SECRET_STRING,
     resave: false, 
     saveUninitialized: false, 
-    cookie: {maxAge: 1800000}
+    //cookie: {maxAge: 1800000}
 }));
+app.use(csrfProtection);
+
+app.use((req, res, next) => { 
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
