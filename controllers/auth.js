@@ -3,9 +3,12 @@ const bcrypt = require('bcryptjs');
 const Cart = require("../models/cart");
 
 exports.getLogin = (req, res, next) => {
+  let message = req.flash('error');
+  message = (message.length > 0) ? message[0] : null;
   res.render('auth/login', {
     path: '/login',
-    pageTitle: 'Login'
+    pageTitle: 'Login',
+    errorMessage: message
   });
 };
 
@@ -15,6 +18,7 @@ exports.postLogin = (req, res, next) => {
 
   User.findOne({where: {email: email}}).then(user => {
     if (!user) {
+      req.flash('error', 'Invalid email or password.');
       return res.redirect('/login');
     }
     bcrypt.compare(password, user.password).then(domatch => {
@@ -38,9 +42,12 @@ exports.postLogout = (req, res, next) => {
 }
 
 exports.getSignup = (req, res, next) => {
+  let message = req.flash('error');
+  message = (message.length > 0) ? message[0] : null;
   res.render('auth/signup', {
     path: '/signup',
-    pageTitle: 'Signup'
+    pageTitle: 'Signup',
+    errorMessage: message
   });
 };
 
@@ -51,6 +58,7 @@ exports.postSignup = (req, res, next) => {
 
   User.findOne({where: {email: email}}).then(user => {
     if(user) {
+      req.flash('error', 'Email already exists.');
       return res.redirect('/signup');
     }
     return bcrypt.hash(password, 12).then(hashed => {

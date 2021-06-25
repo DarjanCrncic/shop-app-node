@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const errorController = require('./controllers/error');
 const sequelize = require('./util/database');
@@ -35,6 +36,7 @@ app.use(session({
     //cookie: {maxAge: 1800000}
 }));
 app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => { 
     res.locals.isAuthenticated = req.session.isLoggedIn;
