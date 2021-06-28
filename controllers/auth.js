@@ -10,7 +10,8 @@ exports.getLogin = (req, res, next) => {
     path: '/login',
     pageTitle: 'Login',
     errorMessage: message,
-    oldInput: {email: '', password: ''}
+    oldInput: {email: '', password: ''},
+    validationErrors: []
   });
 };
 
@@ -24,7 +25,8 @@ exports.postLogin = (req, res, next) => {
       path: '/login',
       pageTitle: 'login',
       errorMessage: errors.array()[0].msg,
-      oldInput: {email: email, password: password}
+      oldInput: {email: email, password: password},
+      validationErrors: errors.array()
     });
   }
 
@@ -34,7 +36,8 @@ exports.postLogin = (req, res, next) => {
         path: '/login',
         pageTitle: 'login',
         errorMessage: 'Invalid email or password.',
-        oldInput: {email: email, password: password}
+        oldInput: {email: email, password: password},
+        validationErrors: [{param: 'email'}, {param:'password'}]
       });
     }
     bcrypt.compare(password, user.password).then(domatch => {
@@ -64,7 +67,8 @@ exports.getSignup = (req, res, next) => {
     path: '/signup',
     pageTitle: 'Signup',
     errorMessage: message,
-    oldInput: {email: '', password: ''}
+    oldInput: {email: '', password: '', confirmPassword: ''},
+    validationErrors: []
   });
 };
 
@@ -78,7 +82,8 @@ exports.postSignup = (req, res, next) => {
       path: '/signup',
       pageTitle: 'Signup',
       errorMessage: errors.array()[0].msg,
-      oldInput: {email: email, password: password}
+      oldInput: {email: email, password: password, confirmPassword: req.body.confirmPassword},
+      validationErrors: errors.array()
     });
   }
   bcrypt.hash(password, 12).then(hashed => {
