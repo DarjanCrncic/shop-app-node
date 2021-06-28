@@ -48,7 +48,12 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+app.use('/500', errorController.get500);
 app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+    res.redirect('/500');
+})
 
 // sequalize relationships
 Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'});
@@ -67,7 +72,9 @@ sequelize
 .then(() => {
     app.listen(3000);
 }).catch((err) => {
-    console.log(err);
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
 });
 
 
